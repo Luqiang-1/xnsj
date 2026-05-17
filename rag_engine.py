@@ -122,7 +122,7 @@ class RAGEngine:
         self.chunks.clear()
         if not self.knowledge_dir.exists():
             self.knowledge_dir.mkdir(parents=True, exist_ok=True)
-        for path in sorted(self.knowledge_dir.glob("*.md")):
+        for path in sorted(self.knowledge_dir.rglob("*.md")):
             self.chunks.extend(split_markdown(path))
 
     def search(self, question: str, limit: int = MAX_CONTEXTS) -> list[tuple[Chunk, float]]:
@@ -133,7 +133,10 @@ class RAGEngine:
         scored: list[tuple[Chunk, float]] = []
         for chunk in self.chunks:
             overlap = query_tokens & chunk.tokens
-            if not overlap:
+            title_aliases = {chunk.title}
+            title_aliases.update(part for part in re.split(r"[（(、/]", chunk.title) if part)
+            title_matched = any(alias and alias in question for alias in title_aliases)
+            if not overlap and not title_matched:
                 continue
             score = len(overlap)
 
@@ -142,8 +145,11 @@ class RAGEngine:
                 if chunk.section == category and any(keyword in lowered_question for keyword in keywords):
                     score += 3
 
-            if chunk.title in question:
-                score += 5
+            if title_matched:
+                score += 10
+
+            if chunk.section == "资料来源":
+                score *= 0.6
 
             # Slight preference for concise focused chunks.
             score = score / math.log(max(len(chunk.tokens), 3), 10)
