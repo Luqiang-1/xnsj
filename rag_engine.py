@@ -146,7 +146,7 @@ class RAGEngine:
                     score += 3
 
             if title_matched:
-                score += 10
+                score += 20
 
             if chunk.section == "资料来源":
                 score *= 0.6
