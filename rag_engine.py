@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import re
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -27,15 +28,118 @@ STOPWORDS = {
     "相关",
     "方面",
     "介绍",
+    "一下",
+    "一下子",
+    "请问",
+    "请",
+    "帮我",
+    "需要",
+    "注意",
+    "事项",
+    "问题",
+    "情况",
+    "进行",
+    "可以",
+    "是否",
+    "哪些",
+    "为什么",
+    "有没有",
+    "多少",
+    "时候",
+    "怎样",
+    "怎么办",
+    "怎么做",
+    "方法",
+    "措施",
+    "建议",
 }
 
 CATEGORY_KEYWORDS = {
-    "种植方式": ["种植", "栽培", "育苗", "定植", "整枝", "水肥", "管理", "方式"],
-    "环境需求": ["环境", "温度", "湿度", "光照", "土壤", "ph", "降雨", "通风"],
-    "农药使用": ["农药", "药剂", "喷施", "安全间隔期", "用药", "剂量", "防治"],
-    "常见病虫害与解决方案": ["病虫害", "病害", "虫害", "灰霉病", "白粉病", "炭疽病", "蚜虫", "红蜘蛛", "解决"],
-    "品种介绍": ["品种", "特性", "成熟", "产量", "品质", "果实"],
-    "采收与销售": ["采收", "销售", "分级", "包装", "贮藏", "运输", "市场"],
+    "种植方式": ["种植", "栽培", "育苗", "定植", "整枝", "修剪", "水肥", "施肥", "追肥", "灌溉", "管理", "架式", "套袋", "疏花", "疏果"],
+    "环境需求": ["环境", "适合", "适宜", "温度", "湿度", "光照", "土壤", "ph", "酸碱", "降雨", "通风", "排水", "气候", "积水"],
+    "农药使用": ["农药", "药剂", "喷施", "安全间隔期", "用药", "剂量", "残留", "登记", "混配", "低毒", "绿色防控"],
+    "常见病虫害与解决方案": [
+        "病虫害",
+        "病害",
+        "虫害",
+        "防治",
+        "防控",
+        "灰霉病",
+        "白粉病",
+        "炭疽病",
+        "霜霉病",
+        "黑痘病",
+        "根腐病",
+        "蚜虫",
+        "红蜘蛛",
+        "蓟马",
+        "叶蝉",
+        "螨",
+        "解决",
+    ],
+    "品种介绍": ["品种", "特性", "成熟", "早熟", "产量", "品质", "果实", "甜度", "口感", "香味", "商品价值"],
+    "采收与销售": ["采收", "采摘", "销售", "分级", "包装", "贮藏", "储藏", "运输", "市场", "冷链", "礼盒", "批发", "电商"],
+}
+
+NEGATIVE_INTENT_KEYWORDS = {
+    "手机",
+    "电脑",
+    "维修",
+    "天气",
+    "写诗",
+    "作文",
+    "小说",
+    "翻译",
+    "代码",
+    "股票",
+    "电影",
+    "旅游",
+    "水稻",
+    "玉米",
+    "小麦",
+}
+
+GENERIC_QUERY_TERMS = {
+    "防治",
+    "防控",
+    "种植",
+    "栽培",
+    "管理",
+    "销售",
+    "采收",
+    "运输",
+    "环境",
+    "适合",
+    "农药",
+    "用药",
+    "病虫害",
+    "病害",
+    "虫害",
+}
+
+FRUIT_DOMAIN_HINTS = {
+    "果",
+    "莓",
+    "葡萄",
+    "柑",
+    "橘",
+    "橙",
+    "柚",
+    "梨",
+    "桃",
+    "李",
+    "杏",
+    "枣",
+    "梅",
+    "樱桃",
+    "草莓",
+    "蓝莓",
+    "树莓",
+    "杨梅",
+    "黑莓",
+    "桑葚",
+    "枸杞",
+    "石榴",
 }
 
 
@@ -66,9 +170,63 @@ def tokenize(text: str) -> list[str]:
         # Chinese word segmentation without third-party dependencies.
         if re.fullmatch(r"[\u4e00-\u9fff]+", term) and len(term) > 2:
             for size in (2, 3, 4):
-                tokens.extend(term[i : i + size] for i in range(0, len(term) - size + 1))
+                tokens.extend(
+                    part
+                    for i in range(0, len(term) - size + 1)
+                    if (part := term[i : i + size]) not in STOPWORDS
+                )
 
     return tokens
+
+
+def title_aliases(title: str) -> set[str]:
+    aliases = {title}
+    aliases.update(part.strip() for part in re.split(r"[（(、/，,\s]+", title) if part.strip())
+    return {alias.rstrip(")）") for alias in aliases if alias.rstrip(")）")}
+
+
+def title_matches(title: str, question: str) -> bool:
+    lowered_question = normalize_text(question)
+    for alias in title_aliases(title):
+        if len(alias) > 1 and alias in lowered_question:
+            return True
+        if len(alias) == 1 and (
+            lowered_question.startswith(alias)
+            or f"{alias}子" in lowered_question
+            or f"{alias}树" in lowered_question
+            or f"{alias}果" in lowered_question
+        ):
+            return True
+    return False
+
+
+def matched_categories(question: str) -> set[str]:
+    lowered_question = normalize_text(question)
+    return {
+        category
+        for category, keywords in CATEGORY_KEYWORDS.items()
+        if any(keyword in lowered_question for keyword in keywords)
+    }
+
+
+def has_domain_signal(question: str, crop_matched: bool, categories: set[str]) -> bool:
+    lowered_question = normalize_text(question)
+    if crop_matched or categories:
+        return True
+    return any(hint in lowered_question for hint in FRUIT_DOMAIN_HINTS)
+
+
+def is_generic_query(question: str, query_tokens: set[str], crop_matched: bool) -> bool:
+    if crop_matched:
+        return False
+    lowered_question = normalize_text(question)
+    useful_tokens = {
+        token
+        for token in query_tokens
+        if len(token) >= 2 and token not in STOPWORDS and token not in GENERIC_QUERY_TERMS
+    }
+    has_fruit_hint = any(hint in lowered_question for hint in FRUIT_DOMAIN_HINTS)
+    return not has_fruit_hint or len(useful_tokens) < 2
 
 
 def split_markdown(path: Path) -> Iterable[Chunk]:
@@ -126,27 +284,57 @@ class RAGEngine:
             self.chunks.extend(split_markdown(path))
 
     def search(self, question: str, limit: int = MAX_CONTEXTS) -> list[tuple[Chunk, float]]:
-        query_tokens = set(tokenize(question))
+        query_token_list = tokenize(question)
+        query_tokens = set(query_token_list)
         if not query_tokens:
+            return []
+
+        query_counts = Counter(query_token_list)
+        categories = matched_categories(question)
+        lowered_question = normalize_text(question)
+        matched_titles = {
+            chunk.title
+            for chunk in self.chunks
+            if title_matches(chunk.title, lowered_question)
+        }
+        crop_matched_any = bool(matched_titles)
+        if not has_domain_signal(question, crop_matched_any, categories):
+            return []
+        if any(keyword in lowered_question for keyword in NEGATIVE_INTENT_KEYWORDS):
+            return []
+        if is_generic_query(question, query_tokens, crop_matched_any):
             return []
 
         scored: list[tuple[Chunk, float]] = []
         for chunk in self.chunks:
-            overlap = query_tokens & chunk.tokens
-            title_aliases = {chunk.title}
-            title_aliases.update(part for part in re.split(r"[（(、/]", chunk.title) if part)
-            title_matched = any(alias and alias in question for alias in title_aliases)
-            if not overlap and not title_matched:
+            if matched_titles and chunk.title not in matched_titles:
                 continue
-            score = len(overlap)
+            overlap = query_tokens & chunk.tokens
+            title_matched = title_matches(chunk.title, lowered_question)
+            category_matched = chunk.section in categories
+            if not matched_titles and len(overlap) < 2:
+                continue
+            if category_matched and not title_matched and not overlap:
+                continue
+            if not overlap and not title_matched and not category_matched:
+                continue
 
-            lowered_question = normalize_text(question)
-            for category, keywords in CATEGORY_KEYWORDS.items():
-                if chunk.section == category and any(keyword in lowered_question for keyword in keywords):
-                    score += 3
+            score = 0.0
+            score += sum(min(query_counts[token], 2) for token in overlap)
+
+            if category_matched:
+                score += 5
 
             if title_matched:
                 score += 20
+                if category_matched:
+                    score += 3
+
+            if chunk.section == "常见问题" and title_matched:
+                score += 0.5
+
+            if categories and chunk.section == "常见问题":
+                score *= 0.75
 
             if chunk.section == "资料来源":
                 score *= 0.6
@@ -156,6 +344,20 @@ class RAGEngine:
             scored.append((chunk, round(score, 2)))
 
         scored.sort(key=lambda item: item[1], reverse=True)
+        if categories:
+            focused = [
+                item
+                for item in scored
+                if item[0].section in categories or item[0].section == "常见问题"
+            ]
+            if any(chunk.section in categories for chunk, _ in focused):
+                focused.sort(
+                    key=lambda item: (
+                        0 if item[0].section in categories else 1,
+                        -item[1],
+                    )
+                )
+                return focused[:limit]
         return scored[:limit]
 
     def answer(self, question: str) -> dict:
@@ -184,6 +386,7 @@ class RAGEngine:
                     "section": chunk.section,
                     "file": chunk.file,
                     "score": score,
+                    "reason": self._explain_match(question, chunk),
                 }
                 for chunk, score in results
             ],
@@ -194,10 +397,23 @@ class RAGEngine:
                     "text": chunk.text,
                     "file": chunk.file,
                     "score": score,
+                    "reason": self._explain_match(question, chunk),
                 }
                 for chunk, score in results
             ],
         }
+
+    def _explain_match(self, question: str, chunk: Chunk) -> str:
+        reasons: list[str] = []
+        lowered_question = normalize_text(question)
+        if title_matches(chunk.title, lowered_question):
+            reasons.append(f"命中作物：{chunk.title}")
+        if chunk.section in matched_categories(question):
+            reasons.append(f"命中问题类型：{chunk.section}")
+        overlap = sorted(set(tokenize(question)) & chunk.tokens)
+        if overlap:
+            reasons.append("关键词重合：" + "、".join(overlap[:6]))
+        return "；".join(reasons) if reasons else "与问题存在弱关键词关联"
 
 
 engine = RAGEngine()
