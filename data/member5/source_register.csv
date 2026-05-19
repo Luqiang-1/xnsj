@@ -1,0 +1,3 @@
+enabled,crop,category,source_type,source,source_site,source_url,collector,collect_date,remark
+1,草莓,浆果类,html_file,sample_pages/strawberry_gray_mold.html,成员5离线演示页面,https://example.local/agri/strawberry-gray-mold,Kevin,2026-05-19,用于展示采集与清洗流程，不进入正式knowledge
+1,葡萄,浆果类,html_file,sample_pages/grape_management.html,成员5离线演示页面,https://example.local/agri/grape-management,Kevin,2026-05-19,用于展示采集与清洗流程，不进入正式knowledge

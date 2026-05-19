@@ -114,6 +114,10 @@ Ctrl + C
 ├── app.py                  # 本地 Web 服务入口
 ├── rag_engine.py           # 知识库加载、检索、回答生成
 ├── config.py               # 系统配置
+├── tools/
+│   └── member5_crawler.py  # 成员5：资料采集与清洗演示工具
+├── data/
+│   └── member5/            # 成员5：来源登记、离线页面、初稿和采集日志
 ├── knowledge/              # 本地知识库 Markdown 文件
 ├── static/
 │   ├── index.html          # 前端页面
@@ -125,12 +129,12 @@ Ctrl + C
 
 ## 如何增加知识库内容
 
-在 `knowledge/` 下新增或修改 `.md` 文件即可。建议每个作物一个文件，例如：
+知识库最终文件放在 `knowledge/` 下，建议每个作物一个文件，并按作物分类建立子目录，例如：
 
 ```text
-knowledge/草莓.md
-knowledge/葡萄.md
-knowledge/猕猴桃.md
+knowledge/浆果类/草莓.md
+knowledge/浆果类/葡萄.md
+knowledge/其他经济价值突出的果用作物/猕猴桃.md
 ```
 
 推荐格式：
@@ -155,9 +159,48 @@ knowledge/猕猴桃.md
 
 ## 采收与销售
 ...
+
+## 资料来源
+* 来源网站：...
+* 来源链接：...
+* 采集时间：...
+* 整理人员：...
+* 校对状态：...
+
+## 整理记录
+* 整理人员：Kevin
+* 整理时间：2026-05-19
 ```
 
-保存后重启 `python app.py`，系统会重新读取知识库。
+保存后重启 `python app.py`，或在服务运行时访问 `http://127.0.0.1:8000/api/reload`，系统会重新读取知识库。
+
+### 成员5：资料采集、清洗与入库
+
+本项目正式问答数据仍直接使用 `knowledge/` 目录中的 Markdown。为了展示成员5的资料采集、清洗和入库工作，项目提供了一个可运行的离线演示工具，不依赖真实网络，课堂展示时更稳定。
+
+演示命令：
+
+```powershell
+python tools/member5_crawler.py --sources data/member5/source_register.csv
+```
+
+运行后会生成：
+
+```text
+data/member5/drafts/        # 采集清洗后的 Markdown 初稿
+data/member5/logs/          # 采集运行日志
+```
+
+成员5的留痕流程如下：
+
+1. 查找公开农业资料页面，优先选择农业农村部门、农技推广机构、高校或标准平台等来源。
+2. 在 `data/member5/source_register.csv` 中登记作物、分类、来源、采集人员和采集时间。
+3. 使用 `tools/member5_crawler.py` 演示正文提取、重复段落去除和网页噪声清理。
+4. 将可用内容按统一小节生成 Markdown 初稿，交给成员2人工校对。
+5. 校对后维护到 `knowledge/分类/作物.md`，并在文件末尾保留 `资料来源` 和 `整理记录`。
+6. 调用 `/api/reload` 重新加载，再用典型问题测试问答效果。
+
+更详细的数据来源、清洗和入库说明见 `docs/member5/data_pipeline.md`，成员5展示材料见 `docs/member5/work_trace.md`。
 
 ## 接口说明
 
