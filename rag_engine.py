@@ -21,6 +21,7 @@ STOPWORDS = {
     "对",
     "要",
     "是",
+    "有",
     "有哪些",
     "怎么",
     "如何",
@@ -28,8 +29,8 @@ STOPWORDS = {
     "相关",
     "方面",
     "介绍",
+    "一个",
     "一下",
-    "一下子",
     "请问",
     "请",
     "帮我",
@@ -123,13 +124,12 @@ FRUIT_DOMAIN_HINTS = {
     "葡萄",
     "柑",
     "橘",
-    "橙",
+    "桔",
     "柚",
     "梨",
     "桃",
     "李",
     "杏",
-    "枣",
     "梅",
     "樱桃",
     "草莓",
@@ -167,7 +167,6 @@ def tokenize(text: str) -> list[str]:
             continue
         tokens.append(term)
 
-        # Chinese word segmentation without third-party dependencies.
         if re.fullmatch(r"[\u4e00-\u9fff]+", term) and len(term) > 2:
             for size in (2, 3, 4):
                 tokens.extend(
@@ -181,7 +180,7 @@ def tokenize(text: str) -> list[str]:
 
 def title_aliases(title: str) -> set[str]:
     aliases = {title}
-    aliases.update(part.strip() for part in re.split(r"[（(、/，,\s]+", title) if part.strip())
+    aliases.update(part.strip() for part in re.split(r"[（(、/\s]+", title) if part.strip())
     return {alias.rstrip(")）") for alias in aliases if alias.rstrip(")）")}
 
 
@@ -248,7 +247,7 @@ def split_markdown(path: Path) -> Iterable[Chunk]:
                     title=title,
                     section=section,
                     text=text,
-                    file=str(path.relative_to(path.parent.parent)),
+                    file=str(path.relative_to(KNOWLEDGE_DIR.parent)),
                     tokens=set(tokenize(f"{title} {section} {text}")),
                 )
             )
@@ -339,7 +338,6 @@ class RAGEngine:
             if chunk.section == "资料来源":
                 score *= 0.6
 
-            # Slight preference for concise focused chunks.
             score = score / math.log(max(len(chunk.tokens), 3), 10)
             scored.append((chunk, round(score, 2)))
 
@@ -369,9 +367,7 @@ class RAGEngine:
                 "contexts": [],
             }
 
-        answer_lines = [
-            "根据本地知识库，可参考以下信息：",
-        ]
+        answer_lines = ["根据本地知识库，可参考以下信息："]
         for index, (chunk, _) in enumerate(results, start=1):
             cleaned = re.sub(r"\s+", " ", chunk.text).strip()
             answer_lines.append(f"{index}. 【{chunk.title} - {chunk.section}】{cleaned}")

@@ -9,6 +9,8 @@ env/
 
 .env
 .env.*
+agri-rag-system/app/data/vector_db/
+.member1_import/
 
 .pytest_cache/
 .mypy_cache/

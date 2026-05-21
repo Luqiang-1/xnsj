@@ -35,7 +35,7 @@
 
 ## 成员 2：知识内容整理与人工校对
 
-负责文件：`knowledge/草莓.md`、`knowledge/葡萄.md`，以及其他经过整理后的知识库 Markdown 文件
+负责文件：`agri-rag-system/knowledge/草莓.md`、`agri-rag-system/knowledge/葡萄.md`，以及其他经过整理后的知识库 Markdown 文件
 
 具体任务：
 
@@ -129,7 +129,7 @@
 
 ## 成员 5：数据采集、清洗与知识库入库工具
 
-负责文件：`knowledge/`、`README.md`，后续可新增 `tools/`、`data/` 或数据处理脚本
+负责文件：`agri-rag-system/knowledge/`、`README.md`，后续可新增 `tools/`、`data/` 或数据处理脚本
 
 具体任务：
 
@@ -139,7 +139,7 @@
 - 对原始资料进行初步清洗，去掉网页导航、广告、重复段落、无关介绍等内容。
 - 将清洗后的资料转换成适合成员 2 校对的 Markdown 初稿。
 - 设计资料来源记录格式，例如来源网站、来源链接、采集时间、整理人员。
-- 设计知识库入库流程：采集资料、清洗内容、转换 Markdown、人工校对、放入 `knowledge/`、重新加载系统。
+- 设计知识库入库流程：采集资料、清洗内容、转换 Markdown、人工校对、放入 `agri-rag-system/knowledge/`、重新加载系统。
 - 在 `README.md` 中补充“如何新增知识库资料”的操作说明。
 - 可规划后续知识库管理功能，例如上传 Markdown、查看已加载文件、点击重新加载知识库等。
 
