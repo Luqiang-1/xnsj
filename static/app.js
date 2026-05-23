@@ -1,37 +1,88 @@
 const form = document.querySelector("#askForm");
 const questionInput = document.querySelector("#question");
-const answerBox = document.querySelector("#answer");
-const sourceBox = document.querySelector("#sources");
+const conversation = document.querySelector("#conversation");
 const askBtn = document.querySelector("#askBtn");
-const reloadBtn = document.querySelector("#reloadBtn");
-const quickButtons = document.querySelectorAll(".quick-questions button");
+const quickQuestionButtons = document.querySelectorAll(".quick-question-btn");
+
+function autoResize() {
+  questionInput.style.height = "auto";
+  questionInput.style.height = `${Math.min(questionInput.scrollHeight, 180)}px`;
+}
+
+function createMessage(role, text, { notice = false, sources = null } = {}) {
+  const article = document.createElement("article");
+  article.className = `message message-${role}`;
+
+  const meta = document.createElement("div");
+  meta.className = "message-meta";
+  meta.textContent = role === "user" ? "提问框" : "智能回答";
+  article.appendChild(meta);
+
+  const bubble = document.createElement("div");
+  bubble.className = `bubble ${role === "user" ? "bubble-user" : "bubble-assistant"}`;
+  if (notice) {
+    bubble.classList.add("notice");
+  }
+  bubble.textContent = text;
+  article.appendChild(bubble);
+
+  if (role === "assistant") {
+    article.appendChild(createAnswerNote());
+    article.appendChild(createSourcesBlock(sources));
+  }
+
+  conversation.appendChild(article);
+  conversation.scrollTop = conversation.scrollHeight;
+
+  return { article, bubble };
+}
+
+function createAnswerNote() {
+  const note = document.createElement("div");
+  note.className = "answer-note reference";
+  note.textContent =
+    "以上回答仅基于当前知识库片段，实际生产中还应结合当地农技部门指导和农药标签要求。";
+  return note;
+}
+
+function createSourcesBlock(sources) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "sources-block";
+
+  const title = document.createElement("div");
+  title.className = "sources-title reference";
+  title.textContent = "引用来源";
+  wrapper.appendChild(title);
+
+  wrapper.appendChild(renderSources(sources));
+  return wrapper;
+}
 
 function renderSources(sources) {
-  sourceBox.innerHTML = "";
+  const container = document.createElement("div");
   if (!sources || sources.length === 0) {
-    sourceBox.className = "sources empty";
-    sourceBox.textContent = "暂无来源";
-    return;
+    container.className = "sources empty reference";
+    return container;
   }
 
-  sourceBox.className = "sources";
-  for (const source of sources) {
+  container.className = "sources reference";
+  sources.forEach((source, index) => {
     const item = document.createElement("div");
     item.className = "source-item";
-    item.innerHTML = `
-      <strong>${source.title} - ${source.section}</strong>
-      <span>${source.file}</span>
-      <span>匹配分：${source.score}</span>
-    `;
-    sourceBox.appendChild(item);
-  }
+    item.textContent =
+      `[${index + 1}]${source.title} - ${source.section}，${source.file}，匹配分：${source.score}`;
+
+    container.appendChild(item);
+  });
+
+  return container;
 }
 
 async function ask(question) {
-  answerBox.classList.remove("notice");
+  createMessage("user", question);
+  const pending = createMessage("assistant", "正在生成回答...", { sources: [] });
+
   askBtn.disabled = true;
-  answerBox.textContent = "正在检索本地知识库...";
-  renderSources([]);
 
   try {
     const response = await fetch("/api/ask", {
@@ -39,47 +90,53 @@ async function ask(question) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question }),
     });
+
     const data = await response.json();
-    answerBox.textContent = data.answer || "未返回答案。";
-    renderSources(data.sources);
+    pending.bubble.textContent = data.answer || "未返回回答。";
+
+    const oldSourcesBlock = pending.article.querySelector(".sources-block");
+    oldSourcesBlock.replaceWith(createSourcesBlock(data.sources));
   } catch (error) {
-    answerBox.textContent = "请求失败，请确认后端服务正在运行。";
-    answerBox.classList.add("notice");
+    pending.bubble.textContent = "请求失败，请确认后端服务正在运行。";
+    pending.bubble.classList.add("notice");
+
+    const oldSourcesBlock = pending.article.querySelector(".sources-block");
+    oldSourcesBlock.replaceWith(createSourcesBlock([]));
   } finally {
     askBtn.disabled = false;
+    questionInput.focus();
+    conversation.scrollTop = conversation.scrollHeight;
   }
 }
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   const question = questionInput.value.trim();
-  if (question) {
-    ask(question);
+  if (!question) {
+    return;
   }
+
+  questionInput.value = "";
+  autoResize();
+  ask(question);
 });
 
-for (const button of quickButtons) {
+for (const button of quickQuestionButtons) {
   button.addEventListener("click", () => {
-    questionInput.value = button.textContent;
-    ask(button.textContent);
+    if (askBtn.disabled) {
+      return;
+    }
+
+    ask(button.textContent.trim());
   });
 }
 
-reloadBtn.addEventListener("click", async () => {
-  reloadBtn.disabled = true;
-  reloadBtn.textContent = "重载中...";
-  answerBox.classList.remove("notice");
-
-  try {
-    const response = await fetch("/api/reload");
-    const data = await response.json();
-    answerBox.textContent = `知识库已重载，当前片段数：${data.chunks}`;
-    renderSources([]);
-  } catch (error) {
-    answerBox.textContent = "重载失败，请检查服务状态。";
-    answerBox.classList.add("notice");
-  } finally {
-    reloadBtn.disabled = false;
-    reloadBtn.textContent = "重载知识库";
+questionInput.addEventListener("input", autoResize);
+questionInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    form.requestSubmit();
   }
 });
+
+autoResize();

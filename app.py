@@ -1,8 +1,9 @@
 import json
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from config import HOST, PORT, STATIC_DIR
+from knowledge_graph import graph_service
 from rag_engine import engine
 
 
@@ -19,8 +20,23 @@ class RAGRequestHandler(SimpleHTTPRequestHandler):
         if parsed.path == "/api/health":
             self._send_json({"status": "ok", "chunks": len(engine.chunks)})
             return
+        if parsed.path == "/api/knowledge/overview":
+            self._send_json(graph_service.overview(chunk_count=len(engine.chunks)))
+            return
+        if parsed.path == "/api/knowledge/crop":
+            crop_name = parse_qs(parsed.query).get("name", [""])[0].strip()
+            if not crop_name:
+                self._send_json({"error": "Missing crop name"}, status=400)
+                return
+            detail = graph_service.crop_detail(crop_name)
+            if detail is None:
+                self._send_json({"error": "Crop not found"}, status=404)
+                return
+            self._send_json(detail)
+            return
         if parsed.path == "/api/reload":
             engine.reload()
+            graph_service.reload()
             self._send_json({"status": "reloaded", "chunks": len(engine.chunks)})
             return
         if parsed.path == "/":

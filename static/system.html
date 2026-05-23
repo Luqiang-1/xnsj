@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>果用经济作物知识问答</title>
+    <link rel="stylesheet" href="/sidebar-nav.css" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="with-side-nav system-page">
+    <nav class="side-nav" aria-label="页面导航">
+      <a class="side-nav-link active" href="/system.html">
+        <span class="side-nav-title">智能问答</span>
+      </a>
+      <a class="side-nav-link" href="/knowledge-graph.html">
+        <span class="side-nav-title">知识图谱</span>
+      </a>
+      <a class="side-nav-link" href="/community.html">
+        <span class="side-nav-title">社区交流</span>
+        <span class="side-nav-note">功能未实现</span>
+      </a>
+    </nav>
+    <main class="chat-shell">
+      <section class="chat-card" aria-label="智能问答对话框">
+        <div id="conversation" class="conversation" aria-live="polite"></div>
+
+        <section class="quick-questions-panel" aria-label="推荐问题">
+          <div class="quick-questions-title">推荐问题</div>
+          <div class="quick-questions">
+            <button type="button" class="quick-question-btn">草莓适合什么生长环境？</button>
+            <button type="button" class="quick-question-btn">葡萄常见病虫害有哪些？</button>
+            <button type="button" class="quick-question-btn">草莓灰霉病怎么防治？</button>
+            <button type="button" class="quick-question-btn">阳光玫瑰葡萄销售建议有哪些？</button>
+          </div>
+        </section>
+
+        <form id="askForm" class="composer">
+          <label class="sr-only" for="question">输入问题</label>
+          <textarea
+            id="question"
+            name="question"
+            rows="1"
+            placeholder="输入你的问题，按 Enter 发送，Shift + Enter 换行"
+            required
+          ></textarea>
+          <button id="askBtn" type="submit">发送</button>
+        </form>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

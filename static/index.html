@@ -3,116 +3,40 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>果用经济作物知识库问答系统</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <title>果用经济作物知识系统</title>
+    <link rel="stylesheet" href="/landing.css" />
   </head>
   <body>
-    <main class="page-shell">
-      <section class="hero" aria-label="系统概览">
-        <nav class="nav">
-          <div class="brand">
-            <span class="brand-mark">RAG</span>
-            <span>果用经济作物知识库</span>
-          </div>
-          <button id="reloadBtn" class="ghost-btn" type="button">重载知识库</button>
-        </nav>
+    <main class="landing-shell" aria-label="系统入口">
+      <section class="landing-board">
+        <div class="landing-visual" aria-hidden="true"></div>
 
-        <div class="hero-grid">
-          <div class="hero-copy">
-            <span class="eyebrow">Local Knowledge QA System</span>
-            <h1>果用经济作物知识库问答系统</h1>
-            <p>
-              面向草莓、葡萄等果用经济作物生产管理与销售场景，基于本地知识库完成可追溯问答。
-            </p>
-            <div class="metrics" aria-label="系统能力">
-              <div>
-                <strong>6+</strong>
-                <span>知识主题</span>
-              </div>
-              <div>
-                <strong>0</strong>
-                <span>外部 API 依赖</span>
-              </div>
-              <div>
-                <strong>100%</strong>
-                <span>来源引用</span>
-              </div>
-            </div>
-          </div>
+        <h1 class="landing-title">果用经济作物知识系统</h1>
 
-          <section class="query-console" aria-label="智能问答">
-            <div class="console-head">
-              <div>
-                <span class="status-dot"></span>
-                本地检索在线
-              </div>
-              <span>回答基于知识库片段</span>
-            </div>
-
-            <form id="askForm" class="ask-form">
-              <label for="question">输入你的作物问题</label>
-              <textarea
-                id="question"
-                name="question"
-                rows="4"
-                placeholder="例如：草莓灰霉病怎么防治？"
-                required
-              ></textarea>
-              <button id="askBtn" type="submit">开始检索问答</button>
-            </form>
-
-            <div class="quick-questions" aria-label="示例问题">
-              <button type="button">草莓适合什么环境？</button>
-              <button type="button">葡萄常见病虫害有哪些？</button>
-              <button type="button">草莓农药使用注意事项</button>
-              <button type="button">阳光玫瑰葡萄销售建议</button>
-            </div>
-          </section>
-        </div>
-      </section>
-
-      <section class="content-grid" aria-label="问答结果">
-        <article class="answer-panel panel">
-          <div class="panel-heading">
-            <div>
-              <span class="panel-kicker">Answer</span>
-              <h2>智能回答</h2>
-            </div>
-            <span class="pill">RAG</span>
-          </div>
-          <pre id="answer">等待提问...</pre>
-        </article>
-
-        <aside class="side-stack">
-          <section class="panel source-panel">
-            <div class="panel-heading compact">
-              <div>
-                <span class="panel-kicker">Sources</span>
-                <h2>引用来源</h2>
-              </div>
-            </div>
-            <div id="sources" class="sources empty">暂无来源</div>
-          </section>
-
-          <section class="panel coverage-panel">
-            <div class="panel-heading compact">
-              <div>
-                <span class="panel-kicker">Coverage</span>
-                <h2>知识库覆盖</h2>
-              </div>
-            </div>
-            <div class="coverage-list">
-              <span>品种介绍</span>
-              <span>种植方式</span>
-              <span>环境需求</span>
-              <span>病虫害防治</span>
-              <span>农药使用</span>
-              <span>采收销售</span>
-            </div>
-          </section>
-        </aside>
+        <a class="entry-button" href="/system.html" aria-label="进入原有系统页面">
+          <svg
+            class="entry-icon"
+            viewBox="0 0 44 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M22 3.5C22.24 3.64 23.04 4.1 25.06 5.22C28.38 7.08 30.67 8.33 31.13 8.72C32.19 9.59 33.6 10.54 35.33 12.07C35.63 12.34 35.36 12.66 35.19 12.84C34.62 13.48 33.02 14.19 31.5 15.17C30.25 15.98 28.94 16.84 27.91 17.47C26.91 18.1 26.2 18.63 25.49 19.09C25.31 19.18 25.11 19.25 24.89 19.36C24.67 19.47 24.43 19.61 24.18 19.75"
+              stroke="#111111"
+              stroke-width="1.9"
+              stroke-linecap="round"
+            />
+            <path
+              d="M8.5 12.67C8.93 12.67 9.36 12.67 12.03 12.6C14.69 12.53 19.57 12.39 22.43 12.36C26.87 12.53 27.64 12.58 28.84 12.65C29.75 12.67 31.28 12.67 32.86 12.67"
+              stroke="#111111"
+              stroke-width="1.9"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span class="sr-only">进入系统</span>
+        </a>
       </section>
     </main>
-    <script src="/app.js"></script>
   </body>
 </html>

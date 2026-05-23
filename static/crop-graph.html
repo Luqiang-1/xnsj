@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>作物知识图谱详情</title>
+    <link rel="stylesheet" href="/sidebar-nav.css" />
+    <link rel="stylesheet" href="/graph.css" />
+  </head>
+  <body class="graph-body detail-body with-side-nav">
+    <nav class="side-nav" aria-label="页面导航">
+      <a class="side-nav-link" href="/system.html">
+        <span class="side-nav-title">智能问答</span>
+      </a>
+      <a class="side-nav-link active" href="/knowledge-graph.html">
+        <span class="side-nav-title">知识图谱</span>
+      </a>
+      <a class="side-nav-link" href="/community.html">
+        <span class="side-nav-title">社区交流</span>
+        <span class="side-nav-note">功能未实现</span>
+      </a>
+    </nav>
+    <main class="detail-shell crop-detail-shell">
+      <section class="glass-panel mindmap-panel solo-panel">
+        <div class="section-heading">
+          <div>
+            <h2>作物知识图谱</h2>
+          </div>
+        </div>
+
+        <div id="mapViewport" class="map-viewport">
+          <div id="mapStage" class="map-stage"></div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/crop-graph.js"></script>
+  </body>
+</html>

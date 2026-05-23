@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>知识图谱浏览界面</title>
+    <link rel="stylesheet" href="/sidebar-nav.css" />
+    <link rel="stylesheet" href="/graph.css" />
+  </head>
+  <body class="graph-body with-side-nav">
+    <nav class="side-nav" aria-label="页面导航">
+      <a class="side-nav-link" href="/system.html">
+        <span class="side-nav-title">智能问答</span>
+      </a>
+      <a class="side-nav-link active" href="/knowledge-graph.html">
+        <span class="side-nav-title">知识图谱</span>
+      </a>
+      <a class="side-nav-link" href="/community.html">
+        <span class="side-nav-title">社区交流</span>
+        <span class="side-nav-note">功能未实现</span>
+      </a>
+    </nav>
+    <main class="graph-shell knowledge-graph-shell">
+      <section class="stats-grid" aria-label="知识库统计">
+        <article class="glass-card stat-card">
+          <span class="mini-label">作物总数</span>
+          <strong id="cropCount">--</strong>
+        </article>
+
+        <article class="glass-card stat-card">
+          <span class="mini-label">文档总数</span>
+          <strong id="documentCount">--</strong>
+        </article>
+
+        <article class="glass-card donut-card">
+          <div class="donut-meta">
+            <span class="mini-label">关键章节完整度</span>
+            <strong id="completionLabel">--</strong>
+            <p id="completionText">正在统计章节完整度...</p>
+          </div>
+          <div class="donut-shell">
+            <div id="completionDonut" class="donut-visual">
+              <div class="donut-core">
+                <span id="completionPercent">0%</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="catalog-panel knowledge-catalog-panel">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">Category Explorer</span>
+            <h2>知识图谱</h2>
+          </div>
+          <p id="overviewMeta">正在加载类别与品种数据...</p>
+        </div>
+
+        <div id="categoryTabs" class="category-tabs" aria-label="果树类别"></div>
+
+        <div class="catalog-grid">
+          <article class="catalog-summary">
+            <span class="mini-label">当前类别</span>
+            <h3 id="activeCategoryTitle">--</h3>
+            <p id="activeCategoryMeta"></p>
+            <div id="activeCategoryStats" class="inline-stats"></div>
+          </article>
+
+          <article class="catalog-crops">
+            <div class="crop-panel-head">
+              <span class="mini-label">细化品种</span>
+              <span id="cropPanelHint"></span>
+            </div>
+            <div id="cropTags" class="crop-tags"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="kg-fruit-showcase" aria-hidden="true">
+        <div class="kg-fruit-stage">
+          <svg class="kg-fruit-hill" viewBox="0 0 973 421" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="kgFruitHillGradient" x1="486.5" y1="182.591" x2="486.5" y2="421" gradientUnits="userSpaceOnUse">
+                <stop offset="0.163462" stop-color="#F8F4ED" />
+                <stop offset="1" stop-color="#C6D0B4" />
+              </linearGradient>
+            </defs>
+            <path d="M0 268C91 198 228 150 486.5 150C745 150 882 198 973 268V421H0V268Z" fill="url(#kgFruitHillGradient)" />
+          </svg>
+          <figure class="kg-fruit-card kg-fruit-card-left">
+            <img src="/kg-fruit-papaya.jpg" alt="" />
+          </figure>
+          <figure class="kg-fruit-card kg-fruit-card-right">
+            <img src="/kg-fruit-guava.jpg" alt="" />
+          </figure>
+        </div>
+      </section>
+    </main>
+
+    <script src="/knowledge-graph.js"></script>
+  </body>
+</html>
