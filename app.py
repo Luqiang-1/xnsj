@@ -1,10 +1,19 @@
 import json
+from socketserver import TCPServer
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 from config import HOST, PORT, STATIC_DIR
 from knowledge_graph import graph_service
 from rag_engine import engine
+
+
+class LocalThreadingHTTPServer(ThreadingHTTPServer):
+    def server_bind(self) -> None:
+        TCPServer.server_bind(self)
+        host, port = self.server_address[:2]
+        self.server_name = str(host)
+        self.server_port = port
 
 
 class RAGRequestHandler(SimpleHTTPRequestHandler):
@@ -74,7 +83,7 @@ class RAGRequestHandler(SimpleHTTPRequestHandler):
 
 
 def main() -> None:
-    server = ThreadingHTTPServer((HOST, PORT), RAGRequestHandler)
+    server = LocalThreadingHTTPServer((HOST, PORT), RAGRequestHandler)
     print(f"果用经济作物知识库问答系统已启动: http://{HOST}:{PORT}")
     print("按 Ctrl+C 停止服务。")
     server.serve_forever()
