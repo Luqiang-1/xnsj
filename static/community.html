@@ -3,11 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>社区交流</title>
+    <title>社区交流论坛</title>
     <link rel="stylesheet" href="/sidebar-nav.css" />
     <link rel="stylesheet" href="/graph.css" />
+    <link rel="stylesheet" href="/community.css" />
   </head>
-  <body class="graph-body with-side-nav">
+  <body class="graph-body with-side-nav community-body">
     <nav class="side-nav" aria-label="页面导航">
       <a class="side-nav-link" href="/system.html">
         <span class="side-nav-title">智能问答</span>
@@ -17,42 +18,70 @@
       </a>
       <a class="side-nav-link active" href="/community.html">
         <span class="side-nav-title">社区交流</span>
-        <span class="side-nav-note">功能未实现</span>
+        <span class="side-nav-note">论坛互动</span>
       </a>
+
+      <div class="side-nav-session" aria-label="登录信息">
+        <span class="side-nav-session-label">当前账号</span>
+        <strong class="side-nav-session-user" data-auth-user>加载中...</strong>
+        <button type="button" class="side-nav-logout" data-auth-logout>退出登录</button>
+      </div>
     </nav>
 
-    <main class="graph-shell">
-      <section class="catalog-panel community-panel">
-        <div class="section-heading">
+    <main class="graph-shell community-shell">
+      <section class="graph-hero community-hero">
+        <div class="section-heading community-heading">
           <div>
-            <span class="eyebrow">Community</span>
-            <h2>社区交流</h2>
+            <span class="eyebrow">Community Forum</span>
+            <h1>社区交流论坛</h1>
           </div>
-          <p>该功能暂未实现，当前页面仅作为导航落点占位。</p>
-        </div>
-
-        <div class="catalog-grid">
-          <article class="catalog-summary">
-            <span class="mini-label">当前状态</span>
-            <h3>开发中</h3>
-            <p>后续可以在这里接入课程讨论、问题征集、案例分享或答疑互动模块。</p>
-            <div class="inline-stats">
-              <span>课堂讨论</span>
-              <span>案例分享</span>
-              <span>互动答疑</span>
-            </div>
-          </article>
-
-          <article class="catalog-crops">
-            <div class="crop-panel-head">
-              <span class="mini-label">说明</span>
-            </div>
-            <p class="side-note">
-              当前可使用左侧导航切换到“智能问答”与“知识图谱”页面。
-            </p>
-          </article>
         </div>
       </section>
+
+      <section class="community-layout">
+        <aside class="glass-panel community-composer">
+          <div class="community-panel-head">
+            <span class="eyebrow">Create Post</span>
+            <h2>发布新帖子</h2>
+            <p>可以分享种植经验、提出问题，或发起针对某类作物的讨论。</p>
+          </div>
+
+          <form id="postForm" class="community-post-form">
+            <input
+              id="postTitle"
+              class="community-input"
+              type="text"
+              maxlength="60"
+              placeholder="帖子标题"
+              required
+            />
+            <textarea
+              id="postContent"
+              class="community-textarea"
+              maxlength="2000"
+              placeholder="写下你的交流内容"
+              required
+            ></textarea>
+
+            <div class="community-form-actions">
+              <p id="postFeedback" class="community-feedback" aria-live="polite"></p>
+              <button id="postSubmitButton" type="submit" class="primary-btn">发布帖子</button>
+            </div>
+          </form>
+        </aside>
+
+        <section class="glass-panel community-feed" aria-label="社区帖子列表">
+          <div class="community-feed-head">
+            <h2>最新交流</h2>
+            <p id="communitySummary">正在加载社区内容...</p>
+          </div>
+
+          <div id="postList" class="post-list"></div>
+        </section>
+      </section>
     </main>
+
+    <script src="/auth-ui.js"></script>
+    <script src="/community.js"></script>
   </body>
 </html>

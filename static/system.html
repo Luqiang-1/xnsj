@@ -17,9 +17,16 @@
       </a>
       <a class="side-nav-link" href="/community.html">
         <span class="side-nav-title">社区交流</span>
-        <span class="side-nav-note">功能未实现</span>
+        <span class="side-nav-note">论坛互动</span>
       </a>
+
+      <div class="side-nav-session" aria-label="登录信息">
+        <span class="side-nav-session-label">当前账号</span>
+        <strong class="side-nav-session-user" data-auth-user>加载中...</strong>
+        <button type="button" class="side-nav-logout" data-auth-logout>退出登录</button>
+      </div>
     </nav>
+
     <main class="chat-shell">
       <section class="chat-card" aria-label="智能问答对话框">
         <div id="conversation" class="conversation" aria-live="polite"></div>
@@ -47,6 +54,8 @@
         </form>
       </section>
     </main>
+
+    <script src="/auth-ui.js"></script>
     <script src="/app.js"></script>
   </body>
 </html>
